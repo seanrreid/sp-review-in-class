@@ -1,4 +1,4 @@
-const db = require("./conn.js");
+const db = require("./conn");
 
 class Parks {
     constructor(id, name) {
