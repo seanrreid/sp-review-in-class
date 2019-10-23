@@ -9,6 +9,8 @@ const express = require("express"),
 const indexRouter = require("./routes/index"),
     usersRouter = require("./routes/users");
 
+require("dotenv").config();
+
 const app = express();
 
 app.engine("html", es6Renderer);
@@ -23,7 +25,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(
     session({
         store: new FileStore(),
-        secret: "get rad",
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
         is_logged_in: false
