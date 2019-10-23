@@ -9,7 +9,9 @@ router.get("/", async (req, res, next) => {
     res.render("template", {
         locals: {
             title: "Time to shred bruh!",
-            parkData: parkList
+            parkData: parkList,
+            isLoggedIn: req.session.is_logged_in,
+            userName: req.session.first_name
         },
         partials: {
             partial: "partial-index"

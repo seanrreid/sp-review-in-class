@@ -10,6 +10,16 @@
         <link rel="stylesheet" href="./stylesheets/style.css">
     </head>
     <body>
+        <nav class="menu--main">
+            <ul>
+                ${!!isLoggedIn ? `
+                    <li><a href="/users/logout">Logout</a></li>
+                ` : `
+                    <li><a href="/users/login">Login</a></li>
+                    <li><a href="/users/signup">Sign Up</a></li>
+                `}
+            </ul>
+        </nav>
         <h1 class="container">${title}</h1>
         <main class="container">${partial}</main>
     </body>

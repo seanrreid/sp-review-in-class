@@ -1,10 +1,14 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express"),
+    bcrypt = require("bcryptjs"),
+    router = express.Router();
+
+const UserModel = require("../models/users");
 
 router.get("/login", async (req, res, next) => {
     res.render("template", {
         locals: {
-            title: "Login"
+            title: "Login",
+            isLoggedIn: req.session.is_logged_in
         },
         partials: {
             partial: "partial-login"
@@ -15,7 +19,8 @@ router.get("/login", async (req, res, next) => {
 router.get("/signup", async (req, res, next) => {
     res.render("template", {
         locals: {
-            title: "Sign Up"
+            title: "Sign Up",
+            isLoggedIn: req.session.is_logged_in
         },
         partials: {
             partial: "partial-signup"
@@ -24,13 +29,39 @@ router.get("/signup", async (req, res, next) => {
 });
 
 router.post("/signup", async (req, res, next) => {
-    console.log(req.body);
-    res.status(200).redirect("/");
+    const { first_name, last_name, email_address } = req.body;
+
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(req.body.password, salt);
+
+    const user = new UserModel(first_name, last_name, email_address, hash);
+    const addUser = await user.save();
+
+    if (addUser) {
+        res.status(200).redirect("/users/login");
+    } else {
+        res.status(500);
+    }
 });
 
 router.post("/login", async (req, res, next) => {
-    console.log(req.body);
-    res.status(200).redirect("/");
+    const { email_address, password } = req.body;
+
+    const user = new UserModel(null, null, email_address, password);
+
+    const response = await user.login();
+    console.log(response);
+
+    if (!!response.isValid) {
+        const { id, first_name, last_name } = response;
+        req.session.is_logged_in = true;
+        req.session.first_name = first_name;
+        req.session.last_name = last_name;
+        req.session.user_id = id;
+        res.status(200).redirect("/");
+    } else {
+        res.sendStatus(401);
+    }
 });
 
 module.exports = router;
